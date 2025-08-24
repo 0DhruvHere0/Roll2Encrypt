@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ludo-Based Encryption</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
+      text-align: center;
+      padding: 40px;
+    }
+    h1 {
+      margin-bottom: 20px;
+    }
+    textarea, input[type="text"] {
+      width: 80%;
+      padding: 10px;
+      margin: 10px 0;
+    }
+    button {
+      padding: 10px 30px;
+      font-size: 16px;
+      cursor: pointer;
+      margin: 10px;
+    }
+    .section {
+      background-color: white;
+      border-radius: 10px;
+      padding: 20px;
+      margin: 20px auto;
+      width: 90%;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .output-box {
+      background-color: #eee;
+      padding: 10px;
+      border-radius: 5px;
+      min-height: 50px;
+      word-wrap: break-word;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <h1>Ludo-Based Data Encryption System</h1>
+  <div class="section">
+    <h2>🔐 Encrypt Your Text</h2>
+    <textarea id="inputText" rows="5" placeholder="Enter text to encrypt..."></textarea><br>
+    <button onclick="encrypt()">Encrypt</button>
+    <div>
+      <h3>Hashed Key:</h3>
+      <div class="output-box" id="hashedKeyOutput"></div>
+      <h3>Code Map (Save this):</h3>
+      <div class="output-box" id="codeMapOutput"></div>
+    </div>
+  </div>
+  <div class="section">
+    <h2>🔓 Decrypt Hashed Key</h2>
+    <input type="text" id="hashedInput" placeholder="Paste hashed key here"><br>
+    <textarea id="codeMapInput" rows="4" placeholder="Paste code map here if available"></textarea><br>
+    <button onclick="decrypt()">Decrypt</button>
+    <div>
+      <h3>Original Text:</h3>
+      <div class="output-box" id="originalTextOutput"></div>
+    </div>
+  </div>
+  <script>
+    let globalCodeMap = {};
+    async function encrypt() {
+      const input = document.getElementById("inputText").value;
+      if (!input.trim()) return alert("Please enter text");
+      const res = await fetch("/encrypt", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: input })
+      });
+      const data = await res.json();
+      if (data.error) return alert(data.error);
+      globalCodeMap = data.codes;
+      document.getElementById("hashedKeyOutput").textContent = data.hash;
+      document.getElementById("codeMapOutput").textContent = JSON.stringify(globalCodeMap, null, 2);
+    }
+    async function decrypt() {
+      const hash = document.getElementById("hashedInput").value;
+      const userCodeMap = document.getElementById("codeMapInput").value;
+      let codeMapToUse = globalCodeMap;
+      if (!hash.trim()) return alert("Please enter hashed key");
+      try {
+        if (userCodeMap.trim()) {
+          codeMapToUse = JSON.parse(userCodeMap);
+        }
+      } catch (e) {
+        alert("Invalid code map");
+        return;
+      }
+      const res = await fetch("/decrypt", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ hash: hash, codes: codeMapToUse })
+      });
+      const data = await res.json();
+      if (data.error) return alert(data.error);
+      document.getElementById("originalTextOutput").textContent = data.original;
+    }
+  </script>
+</body>
+</html>
