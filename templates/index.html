@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Ludo Encryption — UI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+      :root{
+        --bg: #0f1724;
+        --card: #0b1220;
+        --muted: #9aa4b2;
+        --accent: #7c3aed;
+        --glass: rgba(255,255,255,0.03);
+      }
+      *{box-sizing:border-box}
+      body{font-family:Inter,system-ui,Segoe UI,Roboto,Arial; margin:0; background:linear-gradient(180deg,#071029 0%, #0b1220 100%); color:#e6eef6; min-height:100vh}
+  .wrap{max-width:1200px;margin:42px auto;padding:28px}
+      header{display:flex;align-items:center;gap:16px;margin-bottom:20px}
+      .logo{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#4c1d95);display:flex;align-items:center;justify-content:center;font-weight:700}
+  h1{margin:0;font-size:20px}
+  p.lead{margin:6px 0 0;color:var(--muted);font-size:13px}
+      .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px}
+  .card{background:var(--card);padding:18px;border-radius:12px;box-shadow:0 6px 30px rgba(2,6,23,0.6);border:1px solid rgba(255,255,255,0.03)}
+      label{display:block;font-size:13px;color:var(--muted);margin-bottom:8px}
+  textarea,input[type=text]{width:100%;padding:12px;border-radius:8px;background:var(--glass);border:1px solid rgba(255,255,255,0.03);color:inherit;font-size:14px}
+      .row{display:flex;gap:8px;align-items:center}
+      .actions{display:flex;gap:8px;margin-top:12px}
+  button.btn{background:linear-gradient(90deg,var(--accent),#5b21b6);border:none;color:white;padding:10px 14px;border-radius:8px;cursor:pointer;font-weight:600}
+      button.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:9px 12px;color:var(--muted)}
+  .output{background:#061021;padding:12px;border-radius:8px;border:1px solid rgba(255,255,255,0.02);min-height:56px;white-space:pre-wrap;color:#dbeafe;font-family:ui-monospace, SFMono-Regular,Menlo,monospace}
+      .small{font-size:12px;color:var(--muted)}
+      .toolbar{display:flex;gap:8px;align-items:center}
+      footer{margin-top:18px;text-align:center;color:var(--muted);font-size:13px}
+      @media (max-width:860px){.grid{grid-template-columns:1fr}}
+      @media (min-width:1200px) {
+        body { font-size: 17px; }
+        .wrap { max-width: 1400px; padding: 36px; }
+        .card { padding: 26px; border-radius: 14px; }
+        textarea, input[type=text] { padding: 16px; font-size: 16px; }
+        .btn { padding: 12px 20px; font-size: 16px; }
+        .ghost { padding: 10px 14px; }
+        .output { min-height: 90px; font-size: 15px; }
+        .small { font-size: 13px; }
+      }
+      @media (min-width:2000px) {
+        body { font-size: 19px; }
+        .wrap { max-width: 1800px; padding: 48px; }
+        textarea, input[type=text] { padding: 18px; font-size: 18px; }
+        .output { min-height: 120px; font-size: 17px; }
+        .btn { padding: 14px 24px; font-size: 18px; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <div>
+        </div>
+      </header>
+      <div class="grid">
+        <section class="card">
+          <label for="inputText">🔐 Enter text to encrypt</label>
+          <textarea id="inputText" rows="6" placeholder="Type anything... eg: Hello World"></textarea>
+          <div class="row" style="margin-top:10px;justify-content:space-between;align-items:center">
+            <div class="small">Output contains the Ludo hash and a code map. Save the code map to decrypt later.</div>
+            <div class="toolbar">
+              <button class="ghost" id="clearInput">Clear</button>
+              <button class="btn" id="btnEncrypt">Encrypt</button>
+            </div>
+          </div>
+          <div style="margin-top:14px">
+            <label>🎯 Hashed Key</label>
+            <div class="output" id="hashedKeyOutput">—</div>
+            <div class="actions" style="margin-top:8px">
+              <button class="ghost" id="copyHash">Copy</button>
+              <button class="ghost" id="shareHash">Share</button>
+            </div>
+          </div>
+          <div style="margin-top:14px">
+            <label>📦 Code Map (save this)</label>
+            <div class="output" id="codeMapOutput" style="min-height:120px">{}</div>
+            <div class="actions" style="margin-top:8px">
+              <button class="ghost" id="copyCodes">Copy codes</button>
+              <button class="ghost" id="downloadCodes">Download</button>
+            </div>
+          </div>
+        </section>
+        <section class="card">
+          <label for="hashedInput">🔓 Paste Ludo hash to decrypt</label>
+          <input id="hashedInput" type="text" placeholder="Paste Ludo hash here" />
+          <label style="margin-top:12px">📥 Paste Code Map (or upload .json)</label>
+          <textarea id="codeMapInput" rows="8" placeholder='Paste code map JSON here'></textarea>
+          <div class="row" style="margin-top:10px;justify-content:space-between">
+            <div class="small">If you used the encrypt button above, the code map is already available to this page.</div>
+            <div class="toolbar">
+              <input id="fileInput" type="file" accept="application/json" style="display:none" />
+              <button class="ghost" id="uploadCodes">Upload</button>
+              <button class="btn" id="btnDecrypt">Decrypt</button>
+            </div>
+          </div>
+          <div style="margin-top:14px">
+            <label>🔠 Original Text</label>
+            <div class="output" id="originalTextOutput">—</div>
+          </div>
+        </section>
+      </div>
+  <footer></footer>
+    </div>
+    <script>
+      const el = id => document.getElementById(id);
+      const notify = (msg) => {
+        const t = document.createElement('div');
+        t.textContent = msg;
+        Object.assign(t.style, {position:'fixed',right:'18px',bottom:'18px',background:'#0b1220',padding:'10px 14px',borderRadius:'8px',border:'1px solid rgba(255,255,255,0.04)',zIndex:9999});
+        document.body.appendChild(t);
+        setTimeout(()=>t.remove(),2200);
+      }
+      let latestCodes = null;
+      async function encrypt() {
+        const text = el('inputText').value;
+        if (!text.trim()) { notify('Enter text to encrypt'); return }
+        try {
+          const res = await fetch('/encrypt', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text})});
+          const data = await res.json();
+          if (data.error) { notify(data.error); return }
+          latestCodes = data.codes || null;
+          el('hashedKeyOutput').textContent = data.hash;
+          el('codeMapOutput').textContent = JSON.stringify(latestCodes, null, 2);
+          notify('Encrypted — hash and codes ready');
+        } catch (e) { console.error(e); notify('Encryption failed') }
+      }
+      async function decrypt() {
+        const hash = el('hashedInput').value.trim();
+        if (!hash) { notify('Paste the Ludo hash'); return }
+        let codesText = el('codeMapInput').value.trim();
+        let codes = latestCodes;
+        if (codesText) {
+          try { codes = JSON.parse(codesText) } catch(e){ notify('Invalid code map JSON'); return }
+        }
+        if (!codes) { notify('Provide a code map'); return }
+        try {
+          const res = await fetch('/decrypt', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({hash, codes})});
+          const data = await res.json();
+          if (data.error) { notify(data.error); return }
+          el('originalTextOutput').textContent = data.original || '[not recovered]';
+          notify('Decryption attempt complete');
+        } catch(e){ console.error(e); notify('Decryption failed') }
+      }
+      async function copyToClipboard(text){ try { await navigator.clipboard.writeText(text); notify('Copied'); } catch(e){ notify('Copy failed') } }
+      function downloadFile(filename, content){ const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([content],{type:'application/json'})); a.download = filename; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),2000); }
+      document.getElementById('btnEncrypt').addEventListener('click', encrypt);
+      document.getElementById('btnDecrypt').addEventListener('click', decrypt);
+      document.getElementById('clearInput').addEventListener('click', ()=>el('inputText').value='');
+      document.getElementById('copyHash').addEventListener('click', ()=>copyToClipboard(el('hashedKeyOutput').textContent));
+      document.getElementById('copyCodes').addEventListener('click', ()=>copyToClipboard(el('codeMapOutput').textContent));
+      document.getElementById('downloadCodes').addEventListener('click', ()=>downloadFile('code_map.json', el('codeMapOutput').textContent));
+      document.getElementById('shareHash').addEventListener('click', async ()=>{ const h = el('hashedKeyOutput').textContent; if(!h) return notify('No hash'); try{ await navigator.share?.({title:'Ludo hash',text:h}); }catch(e){ copyToClipboard(h) } });
+      const fileInput = el('fileInput');
+      document.getElementById('uploadCodes').addEventListener('click', ()=>fileInput.click());
+      fileInput.addEventListener('change', ()=>{
+        const f = fileInput.files[0]; if(!f) return;
+        const r = new FileReader(); r.onload = e => { el('codeMapInput').value = e.target.result; notify('Loaded code map') }; r.readAsText(f);
+      });
+    </script>
+  </body>
+</html>
