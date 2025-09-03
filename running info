@@ -1,0 +1,14 @@
+Simple deterministic 16-character token generator
+
+Endpoints:
+- POST /encrypt {"text": "..."} -> {"hash": "16-char-token"}
+- POST /decrypt {"text": "...", "hash": "..."} -> {"valid": true/false, "expected": "..."}
+
+Install:
+pip3 install -r requirements.txt
+
+Run:
+python3 app.py
+
+The token is produced via HMAC-SHA256 using the environment variable HASH_SECRET
+or the default 'change_this_secret'. The output uses the requested character set.
